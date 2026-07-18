@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fajar AI Game</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: radial-gradient(circle at center, #0a0f1e, #000);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-family: 'Arial Black', sans-serif;
+    overflow: hidden;
+    perspective: 1000px;
+  }
+.intro { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; display: flex; justify-content: center; align-items: center; z-index: 9999; }
+.intro h1 { font-size: 2em; color: #00aaff; text-shadow: 0 0 20px #00aaff; animation: munculHilang 3s forwards; }
+@keyframes munculHilang { 0% { opacity: 0; transform: scale(0.5); } 20% { opacity: 1; transform: scale(1); } 80% { opacity: 1; } 100% { opacity: 0; } }
+.main { display: none; justify-content: center; align-items: center; flex-direction: column; animation: fadeIn 1s forwards; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.scene { width: 220px; height: 350px; transform-style: preserve-3d; transition: 0.5s; }
+.scene.happy { animation: jogetBaru 0.35s infinite; } /* JOGET */
+.scene.angry { animation: marahMecha 0.15s 8; }
+.scene.tidur { animation: napasTidur 2.5s ease-in-out infinite; } /* TIDUR */
+.scene.berpikir { animation: mikirAnim 1s infinite; }
+.scene.menang { animation: menangAnim 0.5s infinite; } /* MENANG TEBAK */
+
+@keyframes jogetBaru { 0%{transform:rotateY(-25deg) rotateZ(-8deg) translateY(0)} 25%{transform:rotateY(25deg) rotateZ(8deg) translateY(-20px)} 50%{transform:rotateY(-25deg) rotateZ(-8deg) translateY(0)} 75%{transform:rotateY(25deg) rotateZ(8deg) translateY(-20px)} 100%{transform:rotateY(-25deg) rotateZ(-8deg) translateY(0)} }
+@keyframes marahMecha { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-20px)} 75%{transform:translateX(20px)} }
+@keyframes napasTidur { 0%,100%{transform:rotateX(8deg) translateY(0)} 50%{transform:rotateX(18deg) translateY(12px)} }
+@keyframes mikirAnim { 0%,100%{transform:rotateZ(-5deg)} 50%{transform:rotateZ(5deg)} }
+@keyframes menangAnim { 0%,100%{transform:rotateY(0) translateY(0)} 50%{transform:rotateY(360deg) translateY(-20px)} }
+
+.kepala-mecha { width: 140px; height: 140px; background: linear-gradient(135deg, #1a2a5a, #000); border: 4px solid #00aaff; border-radius: 12px; margin: 0 auto; position: relative; box-shadow: 0 0 30px rgba(0,170,255,0.8); transition: 0.5s; }
+.scene.tidur.kepala-mecha { transform: rotateX(30deg) translateY(15px); } /* NUNDUK PAS TIDUR */
+
+.headset-mecha { position: absolute; width: 150px; height: 20px; top: -15px; left: -5px; background: #111; border: 3px solid #00aaff; border-radius: 8px; }
+.ear-mecha { width: 30px; height: 40px; background: #111; border: 3px solid #00aaff; border-radius: 8px; position: absolute; bottom: -10px; }
+.ear-mecha.kiri { left: -10px; }.ear-mecha.kanan { right: -10px; }
+
+.mata-mecha { width: 32px; height: 32px; background: #00ddff; border: 2px solid #00aaff; border-radius: 4px; position: absolute; top: 40px; box-shadow: 0 0 20px #00ddff; transition: 0.2s; }
+.mata-mecha.kiri { left: 25px; }.mata-mecha.kanan { right: 25px; }
+.scene.happy.mata-mecha { background: #00ffff; box-shadow: 0 0 30px #00ffff; animation: mataJoget 0.35s infinite; }
+@keyframes mataJoget { 50%{transform:scale(1.1)} }
+.scene.angry.mata-mecha { background: #ff0044; box-shadow: 0 0 30px #ff0044; animation: mataGetar 0.1s infinite; }
+@keyframes mataGetar { 50%{transform:scale(1.2)} }
+.scene.tidur.mata-mecha { animation: kedipTidur 3s infinite; background: #003366; box-shadow: 0 0 3px #003366; }
+@keyframes kedipTidur { 0%,88%,100%{ height: 4px; } 92%{ height: 32px; } }
+.scene.berpikir.mata-mecha { background: #ffaa00; box-shadow: 0 0 30px #ffaa00; animation: kedip 0.8s infinite; }
+.scene.menang.mata-mecha { background: #00ff88; box-shadow: 0 0 30px #00ff88; animation: mataBintang 0.5s infinite; }
+@keyframes mataBintang { 50%{transform:scale(1.3)} }
+
+.mulut-mecha { width: 60px; height: 6px; background: #00aaff; position: absolute; bottom: 30px; left: 40px; border-radius: 3px; box-shadow: 0 0 10px #00aaff; transition: 0.3s; }
+.scene.happy.mulut-mecha { height: 18px; border-radius: 3px; background: linear-gradient(#ff66cc, #ff3399); }
+.scene.angry.mulut-mecha { height: 16px; background: #ff0044; }
+.scene.tidur.mulut-mecha { width: 35px; height: 4px; left: 52px; }
+
+.zzz { position: absolute; top: -45px; right: 15px; font-size: 1.8em; color: #00aaff; font-weight: bold; opacity: 0; }
+.scene.tidur.zzz { animation: zzzNaik 2.8s infinite; }
+@keyframes zzzNaik { 0% { opacity: 0; transform: translateY(0) } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(-60px) } }
+
+.badan-mecha { width: 160px; height: 180px; background: linear-gradient(180deg, #0a1a3a, #000); border: 4px solid #00aaff; border-radius: 15px; margin: -5px auto 0; position: relative; }
+.tv-mecha { width: 90px; height: 55px; background: #000; border: 3px solid #00aaff; border-radius: 8px; position: absolute; top: 25px; left: 35px; display: flex; justify-content: center; align-items: center; color: #00aaff; font-size: 2em; font-weight: bold; }
+.tv-mecha.nyala { box-shadow: 0 0 20px #00aaff; animation: glow 1s infinite; }
+@keyframes glow { 50%{box-shadow: 0 0 40px #00aaff} }
+.kaki-mecha { width: 45px; height: 45px; background: linear-gradient(135deg, #222, #000); border: 3px solid #00aaff; border-radius: 10px; position: absolute; bottom: -20px; }
+.kaki-mecha.kiri { left: 25px; }.kaki-mecha.kanan { right: 25px; }
+
+.game-box { width: 90%; max-width: 400px; background: rgba(0,170,255,0.1); border: 2px solid #00aaff; border-radius: 15px; margin-top: 20px; padding: 15px; color: #00aaff; text-align: center; }
+.game-box h2 { font-size: 1.2em; margin-bottom: 10px; }
+.game-input { display: flex; gap: 10px; margin-top: 10px; justify-content: center; }
+.game-input input { width: 100px; padding: 10px; border-radius: 10px; border: 2px solid #00aaff; background: #000; color: #00aaff; outline: none; font-size: 1.2em; text-align: center; }
+.game-input button { padding: 10px 20px; border-radius: 10px; border: none; background: #00aaff; color: #000; font-weight: bold; cursor: pointer; font-size: 1em; }
+.petunjuk { font-size: 0.9em; margin-top: 10px; min-height: 40px; }
+.nyawa { color: #ff0044; font-size: 1.2em; }
+
+.menu { margin-top: 15px; display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
+.icon { font-size: 2.2em; cursor: pointer; transition: 0.2s; filter: drop-shadow(0 0 10px #00aaff); }
+.icon:active { transform: scale(0.8); }
+
+.hati { position: absolute; font-size: 2.5em; color: #00ff88; animation: terbang 1.5s forwards; pointer-events: none; }
+@keyframes terbang { 0% { opacity: 1; transform: scale(0.5) translateY(0); } 100% { opacity: 0; transform: scale(1.5) translateY(-100px); } }
+.pukulan { position: absolute; font-size: 2em; color: #ff0044; font-weight: bold; animation: pukulAnim 0.5s forwards; pointer-events: none; }
+@keyframes pukulAnim { 0% { opacity: 1; transform: scale(0.5); } 100% { opacity: 0; transform: scale(2) translateY(-50px); } }
+</style>
+</head>
+<body>
+
+<div class="intro" id="intro"><h1>FAJAR AI</h1></div>
+
+<div class="main" id="main">
+  <div class="scene" id="scene">
+    <div class="kepala-mecha" id="kepala">
+      <div class="headset-mecha"><div class="ear-mecha kiri"></div><div class="ear-mecha kanan"></div></div>
+      <div class="mata-mecha kiri"></div><div class="mata-mecha kanan"></div>
+      <div class="mulut-mecha"></div>
+      <div class="zzz">Zzz</div> <!-- ZZZ BUAT TIDUR -->
+    </div>
+    <div class="badan-mecha">
+      <div class="tv-mecha" id="tv">?</div>
+      <div class="kaki-mecha kiri"></div><div class="kaki-mecha kanan"></div>
+    </div>
+  </div>
+
+  <div class="game-box">
+    <h2>🎮 GAME TEBAK ANGKA 1-30</h2>
+    <div class="petunjuk" id="petunjuk">Aku mikirin angka 1-30. Tebak ya!</div>
+    <div class="game-input">
+      <input type="number" id="angkaInput" placeholder="?" min="1" max="30">
+      <button id="tebakBtn">Tebak!</button>
+    </div>
+    <div>Nyawa: <span class="nyawa" id="kesempatan">❤️❤️❤️❤️❤️</span></div>
+  </div>
+
+  <div class="menu">
+    <div class="icon" data-aksi="ulang">🔄</div> <!-- MAIN LAGI -->
+    <div class="icon" data-aksi="petunjuk">💡</div> <!-- PETUNJUK -->
+    <div class="icon" data-aksi="joget">💃</div> <!-- JOGET -->
+    <div class="icon" data-aksi="tidur">😴</div> <!-- TIDUR -->
+  </div>
+</div>
+
+<script>
+  let audioAktif = false;
+  let angkaRahasia = 0;
+  let kesempatan = 5;
+  let ngorokInterval = null;
+  const scene = document.getElementById('scene');
+  const kepala = document.getElementById('kepala');
+  const tv = document.getElementById('tv');
+  const angkaInput = document.getElementById('angkaInput');
+  const tebakBtn = document.getElementById('tebakBtn');
+  const petunjuk = document.getElementById('petunjuk');
+  const kesempatanSpan = document.getElementById('kesempatan');
+  const intro = document.getElementById('intro');
+  const main = document.getElementById('main');
+
+  setTimeout(() => { intro.style.display = 'none'; main.style.display = 'flex'; mulaiGame(); }, 3000);
+
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  function playSound(type) {
+    if(!audioAktif) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    gain.connect(audioCtx.destination); osc.connect(gain);
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+
+    if(type === 'benar') { osc.type = 'sine'; osc.frequency.value = 880; setTimeout(()=>{osc.frequency.value=1046},100); }
+    if(type === 'salah') { osc.type = 'sawtooth'; osc.frequency.value = 150; }
+    if(type === 'klik') { osc.type = 'sine'; osc.frequency.value = 660; }
+    if(type === 'gameover') { osc.type = 'sawtooth'; osc.frequency.value = 80; }
+    if(type === 'joget') { osc.type = 'square'; osc.frequency.value = 523; setTimeout(() => {osc.frequency.value = 659}, 100); setTimeout(() => {osc.frequency.value = 784}, 200); }
+    if(type === 'tidur') { osc.type = 'sine'; osc.frequency.value = 160; }
+    if(type === 'start') { osc.type = 'sine'; osc.frequency.value = 1046; }
+    osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+  }
+
+  function playNgorok() { if(!audioAktif) return; const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain(); gain.connect(audioCtx.destination); osc.connect(gain); gain.gain.setValueAtTime(0.15, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.8); osc.type = 'sawtooth'; osc.frequency.value = 80; osc.start(); osc.stop(audioCtx.currentTime + 0.8); }
+  function startNgorok() { playNgorok(); ngorokInterval = setInterval(playNgorok, 1200); }
+  function stopNgorok() { clearInterval(ngorokInterval); }
+
+  function updateNyawa() { kesempatanSpan.innerText = '❤️'.repeat(kesempatan); }
+
+  function mulaiGame() {
+    angkaRahasia = Math.floor(Math.random() * 30) + 1;
+    kesempatan = 5;
+    updateNyawa();
+    petunjuk.innerText = "Aku mikirin angka 1-30. Tebak ya!";
+    tv.innerText = "?";
+    reset();
+    scene.classList.add('berpikir');
+  }
+
+  function reset() {
+    scene.className = 'scene';
+    tv.classList.remove('nyala');
+    stopNgorok();
+  }
+
+  function bikinHati(x, y) { const hati = document.createElement('div'); hati.className = 'hati'; hati.innerText = '🎉'; hati.style.left = x + 'px'; hati.style.top = y + 'px'; document.body.appendChild(hati); setTimeout(() => hati.remove(), 1500); }
+  function efekSalah(x, y) { const pukul = document.createElement('div'); pukul.className = 'pukulan'; pukul.innerText = '💔'; pukul.style.left = x + 'px'; pukul.style.top = y + 'px'; document.body.appendChild(pukul); setTimeout(() => pukul.remove(), 500); }
+
+  tebakBtn.onclick = () => {
+    const tebakan = parseInt(angkaInput.value);
+    if(isNaN(tebakan) || tebakan < 1 || tebakan > 30) {
+      petunjuk.innerText = "Masukin angka 1-30 ya!";
+      return;
+    }
+
+    kesempatan--;
+    updateNyawa();
+    playSound('klik');
+    tv.innerText = tebakan;
+    tv.classList.add('nyala');
+    setTimeout(()=>tv.classList.remove('nyala'), 500);
+
+    if(tebakan === angkaRahasia) {
+      reset();
+      scene.classList.add('menang');
+      playSound('benar');
+      bikinHati(window.innerWidth/2, window.innerHeight/2 - 100);
+      petunjuk.innerText = `YEAY BENAR! Angkanya ${angkaRahasia} 🎉 Pencet 🔄 buat main lagi`;
+      tv.innerText = angkaRahasia;
+      angkaInput.disabled = true;
+      tebakBtn.disabled = true;
+      setTimeout(reset, 3000);
+    }
+    else if(tebakan < angkaRahasia) {
+      reset();
+      scene.classList.add('angry');
+      playSound('salah');
+      efekSalah(window.innerWidth/2, window.innerHeight/2 - 100);
+      petunjuk.innerText = `Terlalu RENDAH! Coba angka lebih besar ⬆️`;
+      setTimeout(reset, 1000);
+    }
+    else {
+      reset();
+      scene.classList.add('angry');
+      playSound('salah');
+      efekSalah(window.innerWidth/2, window.innerHeight/2 - 100);
+      petunjuk.innerText = `Terlalu TINGGI! Coba angka lebih kecil ⬇️`;
+      setTimeout(reset, 1000);
+    }
+
+    if(kesempatan <= 0 && tebakan!== angkaRahasia) {
+      reset();
+      scene.classList.add('angry');
+      playSound('gameover');
+      petunjuk.innerText = `GAME OVER! 💀 Angkanya ${angkaRahasia}. Pencet 🔄 buat coba lagi`;
+      tv.innerText = angkaRahasia;
+      angkaInput.disabled = true;
+      tebakBtn.disabled = true;
+    }
+
+    angkaInput.value = '';
+  };
+
+  angkaInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') tebakBtn.click(); });
+
+  document.querySelectorAll('.icon').forEach(icon => {
+    icon.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const aksi = icon.dataset.aksi;
+      playSound('klik');
+      reset();
+
+      if(aksi === 'ulang') {
+        angkaInput.disabled = false;
+        tebakBtn.disabled = false;
+        mulaiGame();
+      }
+      if(aksi === 'petunjuk') {
+        if(kesempatan < 5) {
+          if(angkaRahasia % 2 === 0) petunjuk.innerText = "Petunjuk: Angkanya GENAP";
+          else petunjuk.innerText = "Petunjuk: Angkanya GANJIL";
+        } else {
+          petunjuk.innerText = "Petunjuk baru kebuka pas nyawa berkurang!";
+        }
+      }
+      if(aksi === 'joget') {
+        scene.classList.add('happy');
+        playSound('joget');
+        petunjuk.innerText = "Asik joget dulu! 💃";
+        setTimeout(() => { reset(); petunjuk.innerText = "Lanjut tebak angka!"; }, 3000);
+      }
+      if(aksi === 'tidur') {
+        scene.classList.add('tidur');
+        playSound('tidur');
+        startNgorok();
+        petunjuk.innerText = "Zzz... Fajar ngantuk... khhh khhh";
+        setTimeout(() => { reset(); petunjuk.innerText = "Udah bangun! Lanjut main"; }, 7000);
+      }
+    });
+  });
+
+  kepala.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    bikinHati(touch.clientX - 20, touch.clientY - 20);
+    reset();
+    scene.classList.add('happy');
+    playSound('benar');
+    setTimeout(reset, 1000);
+  });
+
+  document.body.addEventListener('click', function nyalain() {
+    if(!audioAktif) { audioAktif = true; audioCtx.resume(); playSound('start'); document.body.removeEventListener('click', nyalain); }
+  });
+
+</script>
+
+</body>
+</html>
